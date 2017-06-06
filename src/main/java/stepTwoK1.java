@@ -12,12 +12,20 @@ public class stepTwoK1 implements WritableComparable{
     private Text created_at;
     private LongWritable id;
 
+    public Text getRawJson() {
+        return rawJson;
+    }
+
+    private Text rawJson;
+
     public stepTwoK1(String json){
         this.created_at = new Text();
+        this.rawJson = new Text();
         this.id = new LongWritable();
         tweetParser jsonTweet = new tweetParser(json);
         created_at.set(jsonTweet.getCreatedAt());
         id.set(jsonTweet.getId());
+        rawJson.set(json);
     }
 
     public stepTwoK1(){

@@ -1,39 +1,46 @@
+import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.DoubleWritable;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
 public class TdIdf {
 
     private String maxFdLoc;
     private String wordCount;
     private int totalTweet;
-    Word[] tweetArray;
-    HashMap<String, Double> tdIdfDic;
+    private  Word[] tweetArray;
+    private MapWritable tdIdfDic;
 
     public TdIdf(String maxFdLoc, String wordCount, Word[] tweetArray, int totalTweet) throws IOException {
         this.maxFdLoc = maxFdLoc;
         this.wordCount = wordCount;
         this.tweetArray = tweetArray;
         this.totalTweet = totalTweet;
-        this.tdIdfDic = new HashMap<String, Double>();
+        this.tdIdfDic = new MapWritable();
 
     }
 
-    private HashMap<String, Double> start() throws IOException {
+    public MapWritable start() throws IOException {
         for (Word newWord : tweetArray) {
             if (!newWord.isStopWord()) {
                 double temp = tf(newWord);
                 double temp1 = idf(newWord);
                 double tfidf = temp * temp1;
-                tdIdfDic.put(newWord.getWord(), tfidf);
+                DoubleWritable writableTfIdf  = new DoubleWritable();
+                writableTfIdf.set(tfidf);
+                Text newText = new Text();
+                newText.set(newWord.getWord());
+                this.tdIdfDic.put(newText, writableTfIdf);
             }
         }
         return tdIdfDic;
     }
 
-    public double tf(Word newWord) throws IOException {
+    private double tf(Word newWord) throws IOException {
         long wordCounter = 0;
         for (Word word : tweetArray) {
             if(word.equals(newWord)){
@@ -49,6 +56,9 @@ public class TdIdf {
                     break;
                 }
             }
+        }
+        if (maxFd == 0){
+            return 0;
         }
         return (0.5 + 0.5 * (wordCounter / maxFd));
     }
@@ -74,7 +84,7 @@ public class TdIdf {
         String max = "/home/noam/hadoop-2.8.0/out/max_fd/part-r-00000";
         String wc = "/home/noam/hadoop-2.8.0/out/word_count/part-r-00000";
         TdIdf x = new TdIdf(max ,wc ,array, 7);
-        HashMap<String, Double> Lol = x.start();
+        MapWritable Lol = x.start();
         System.out.println(Lol.get("noam"));
     }
 }

@@ -19,12 +19,23 @@ public class stepWordCountDriver {
         private Text word = new Text();
 
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            StringTokenizer itr = new StringTokenizer(value.toString());
-            while (itr.hasMoreTokens()) {
-                Word newWord = new Word(itr.nextToken());
-                if (!newWord.isStopWord()) {
-                    word.set(newWord.getWord());
+
+            String[] stringWordAarry = value.toString().split("\\s+");
+            Word[] wordArray = new Word[stringWordAarry.length];
+            for (int i = 0; i < stringWordAarry.length; i++) {
+                wordArray[i] = new Word(stringWordAarry[i]);
+            }
+
+            for (int i = 0; i < stringWordAarry.length; i++) {
+                if (wordArray[i] != null) {
+                    word.set(wordArray[i].getWord());
+                    String newWord = wordArray[i].getWord();
                     context.write(word, one);
+                    for (int j = 0; j < stringWordAarry.length; j++) {
+                        if (wordArray[j] != null && wordArray[j].getWord().equals(newWord)) {
+                            wordArray[j] = null;
+                        }
+                    }
                 }
             }
         }
