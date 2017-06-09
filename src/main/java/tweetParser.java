@@ -1,6 +1,6 @@
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.json.simple.parser.JSONParser;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 
 public class tweetParser {
 
